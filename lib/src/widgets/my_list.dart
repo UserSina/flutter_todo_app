@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../service/todo.dart';
 import 'list_item.dart';
 
 class MyList extends StatelessWidget {
-  final List<Map<String, Object>> items;
+  final List<Todo> items;
   final Function removeItem;
 
   MyList({this.items, this.removeItem});

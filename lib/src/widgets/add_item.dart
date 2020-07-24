@@ -30,7 +30,7 @@ class AddItem extends StatelessWidget {
           height: 45,
           margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: RaisedButton(
-            onPressed: () => addItem(myController.text),
+            onPressed: () => addItem(myController.text, context),
             color: Color(0xffc2bad8),
             textColor: Color(0xff483d8b),
             child: Row(

@@ -1,8 +1,10 @@
-import 'package:demo_flutter_app/src/widgets/add_item.dart';
 import 'package:flutter/material.dart';
 
 import './src/widgets/add_item.dart';
 import './src/widgets/my_list.dart';
+
+import './src/service/db_manager.dart';
+import './src/service/todo.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,47 +15,61 @@ class MyApp extends StatefulWidget {
 }
 
 // Will NOT be re-rendered when external data changes (persistent)
-// This is because data should NOT be reset
+// This is because data (all_variables and functions) should NOT be reset
+// To cause a re-render, change these local variables under setState() {}
 class _MyAppState extends State<MyApp> {
-  final _myTodos = [
-    {
-      "id": 0,
-      "title": "First todo item",
-    },
-    {
-      "id": 1,
-      "title": "Second todo item",
-    },
-    {
-      "id": 2,
-      "title": "Third todo item",
-    },
-    {
-      "id": 3,
-      "title": "Fourth todo item",
-    },
+  Future<List<Todo>> futureTodos;
+
+  @override
+  void initState() {
+    super.initState();
+    futureTodos = getTodos();
+  }
+
+  List<Todo> _myTodos = [
+    // Just a placeholder, can be emptied
+    Todo(0, "First"),
+    Todo(1, "Second"),
+    Todo(0, "Third"),
   ];
 
-  void _addItem(String itemText) {
+  void _addItem(String itemText, BuildContext context) {
     if (itemText == "" || itemText == null) {
       print("Empty text !!");
+      showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: const Text('Please enter a valid text'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Okay'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
       return;
     }
 
-    var myObj = {
-      "id": 5464, // Randomize this
-      "title": itemText,
-    };
-    setState(() {
-      _myTodos.add(myObj);
-    });
+    postTodo(itemText).then(
+      (value) {
+        setState(() {
+          _myTodos.add(value);
+        });
+      },
+    ).catchError((onError) => null);
     print("Item added: $itemText");
   }
 
   void _removeItem(int id) {
     setState(() {
       // Should be inside setState to cause a re-render
-      _myTodos.removeWhere((item) => item['id'] == id);
+      _myTodos.removeWhere((item) => item.id == id);
     });
     print("Item removed, index: $id");
   }
@@ -70,7 +86,39 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           children: <Widget>[
             AddItem(addItem: _addItem),
-            Flexible(child: MyList(items: _myTodos, removeItem: _removeItem)),
+            FutureBuilder<List<Todo>>(
+              future: futureTodos,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  _myTodos = snapshot.data;
+                  return Flexible(
+                    child: MyList(items: _myTodos, removeItem: _removeItem),
+                  );
+                } else if (snapshot.hasError) {
+                  // return Text("${snapshot.error}");
+                  return AlertDialog(
+                    title: Text("Error loading todos"),
+                    content: Text("Check your internet connection !"),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("Okay"),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    ],
+                  );
+                }
+
+                // By default, show a loading spinner.
+                return Container(
+                  margin: EdgeInsets.all(60),
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              },
+            )
           ],
         ),
       ),
