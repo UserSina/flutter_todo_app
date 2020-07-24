@@ -6,5 +6,8 @@ A small Flutter demo app that includes:
 - State management system
 - Classic database manipulation
 
-<h3 align="center">UI Screenshot</p>
-![](/Extras/FlutterImg.PNG)
+<h2 align="center">UI Screenshot</p>
+
+<p align="center">
+<img src="Extras/FlutterImg.PNG" />
+</p>
