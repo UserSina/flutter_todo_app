@@ -4,7 +4,7 @@ A small Flutter demo app that includes:
 
 - Basic User Interface
 - State management system
-- Classic database manipulation
+- GET & POST requests
 
 <h2 align="center">UI Screenshot</p>
 
