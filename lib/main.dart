@@ -1,37 +1,27 @@
+import 'package:demo_flutter_app/service/http_service.dart';
+import 'package:demo_flutter_app/models/todo.dart';
+import 'package:demo_flutter_app/widgets/add_item.dart';
+import 'package:demo_flutter_app/widgets/todo_list.dart';
 import 'package:flutter/material.dart';
-
-import './src/widgets/add_item.dart';
-import './src/widgets/my_list.dart';
-
-import './src/service/db_manager.dart';
-import './src/service/todo.dart';
 
 void main() => runApp(MyApp());
 
-// Will be re-rendered when external data changes
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
-// Will NOT be re-rendered when external data changes (persistent)
-// This is because data (all_variables and functions) should NOT be reset
-// To cause a re-render, change these local variables under setState() {}
 class _MyAppState extends State<MyApp> {
+  HttpService _httpService = new HttpService();
   Future<List<Todo>> futureTodos;
 
   @override
   void initState() {
     super.initState();
-    futureTodos = getTodos();
+    futureTodos = _httpService.getTodos();
   }
 
-  List<Todo> _myTodos = [
-    // Just a placeholder, can be emptied
-    Todo(0, "First"),
-    Todo(1, "Second"),
-    Todo(0, "Third"),
-  ];
+  List<Todo> _myTodos = [];
 
   void _addItem(String itemText, BuildContext context) {
     if (itemText == "" || itemText == null) {
@@ -56,7 +46,7 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    postTodo(itemText).then(
+    _httpService.postTodo(itemText).then(
       (value) {
         setState(() {
           _myTodos.add(value);
@@ -77,10 +67,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Colors.purple[900]),
       home: Scaffold(
         appBar: AppBar(
-          title: Text("Flutter Todo App", style: TextStyle(fontSize: 25)),
+          title: Text(
+            "Flutter Todo App",
+            style: TextStyle(fontSize: 25),
+          ),
           centerTitle: true,
         ),
         body: Column(
@@ -92,7 +86,7 @@ class _MyAppState extends State<MyApp> {
                 if (snapshot.hasData) {
                   _myTodos = snapshot.data;
                   return Flexible(
-                    child: MyList(items: _myTodos, removeItem: _removeItem),
+                    child: TodoList(items: _myTodos, removeItem: _removeItem),
                   );
                 } else if (snapshot.hasError) {
                   // return Text("${snapshot.error}");

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:demo_flutter_app/models/todo.dart';
 
-import '../service/todo.dart';
-
-class ListItem extends StatelessWidget {
+class TodoItem extends StatelessWidget {
   final Todo todoItem;
   final Function removeItem;
-
-  ListItem({this.todoItem, this.removeItem});
+  TodoItem({this.todoItem, this.removeItem});
 
   @override
   Widget build(BuildContext context) {

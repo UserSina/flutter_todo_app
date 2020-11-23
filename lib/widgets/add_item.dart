@@ -7,9 +7,6 @@ class AddItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This controller resets every re-render (due to external data being passed)
-    // To avoid the reset, move the controller to _MyAppState
-    // and pass it as an argument(parameter) to this class (AddItem)
     final myController = TextEditingController();
 
     return Column(
