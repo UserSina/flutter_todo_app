@@ -50,7 +50,11 @@ class _MainScreenState extends State<MainScreen> {
           _myTodos.add(value);
         });
       },
-    ).catchError((onError) => null);
+    ).catchError(
+      (onError) => () {
+        print("Error inserting");
+      },
+    );
     print("Item added: $itemText");
   }
 
